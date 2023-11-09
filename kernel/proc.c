@@ -124,7 +124,6 @@ allocproc(void)
 found:
   p->pid = allocpid();
   p->state = USED;
-  p->priority = 0;
 
   // Allocate a trapframe page.
   if((p->trapframe = (struct trapframe *)kalloc()) == 0){
@@ -170,7 +169,6 @@ freeproc(struct proc *p)
   p->killed = 0;
   p->xstate = 0;
   p->state = UNUSED;
-  p->priority = 0;
 }
 
 // Create a user page table for a given process, with no user memory,
@@ -322,9 +320,6 @@ fork(void)
 
   acquire(&np->lock);
   np->state = RUNNABLE;
-  int prty;
-  argint(0, &prty);
-  np->priority = prty;
   release(&np->lock);
 
   return pid;
@@ -456,29 +451,23 @@ scheduler(void)
   for(;;){
     // Avoid deadlock by ensuring that devices can interrupt.
     intr_on();
-    struct proc *highest_p = 0;
 
     for(p = proc; p < &proc[NPROC]; p++) {
-      if(p->state != RUNNABLE) {
-        continue;
-      }
-
-      if(highest_p == 0 || p->priority >= highest_p->priority) {
-        highest_p = p;
-      }
-    }
-
-    acquire(&highest_p->lock); 
-    if(highest_p != 0){
+      acquire(&p->lock);
       if(p->state == RUNNABLE) {
-       highest_p->state = RUNNING;
-        c->proc = highest_p;
-        swtch(&c->context, &highest_p->context);
+        // Switch to chosen process.  It is the process's job
+        // to release its lock and then reacquire it
+        // before jumping back to us.
+        p->state = RUNNING;
+        c->proc = p;
+        swtch(&c->context, &p->context);
 
-        c->proc = 0; 
+        // Process is done running for now.
+        // It should have changed its p->state before coming back.
+        c->proc = 0;
       }
+      release(&p->lock);
     }
-    release(&highest_p->lock);
   }
 }
 
