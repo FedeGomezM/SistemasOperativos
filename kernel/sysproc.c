@@ -22,34 +22,6 @@ sys_getpid(void)
 }
 
 uint64
-sys_getppid(void)
-{
-  return myproc()->parent->pid;
-}
-
-uint64
-sys_getancestor(void)
-{
-  int i;
-  argint(0, &i);
-  struct proc *ancestor = myproc();
-  int anc_pid = myproc()->pid;
-
-  for (int j = 0; j < i; j++){
-    if (ancestor->parent){
-      anc_pid = ancestor->parent->pid;
-      ancestor = ancestor->parent;
-    }
-    else{
-      anc_pid = -1;
-      break;
-    }
-  };
-
-  return anc_pid;
-}
-
-uint64
 sys_fork(void)
 {
   return fork();
