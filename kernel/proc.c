@@ -322,9 +322,6 @@ fork(void)
 
   acquire(&np->lock);
   np->state = RUNNABLE;
-  int prty;
-  argint(0, &prty);
-  np->priority = prty;
   release(&np->lock);
 
   return pid;
@@ -459,6 +456,7 @@ scheduler(void)
     struct proc *highest_p = 0;
 
     for(p = proc; p < &proc[NPROC]; p++) {
+      //acquire(&p->lock);
       if(p->state != RUNNABLE) {
         continue;
       }
@@ -466,19 +464,20 @@ scheduler(void)
       if(highest_p == 0 || p->priority >= highest_p->priority) {
         highest_p = p;
       }
+      //release(&p->lock);
     }
-
-    acquire(&highest_p->lock); 
+ 
     if(highest_p != 0){
-      if(p->state == RUNNABLE) {
-       highest_p->state = RUNNING;
+      acquire(&highest_p->lock);
+      if(highest_p->state == RUNNABLE) {
+        highest_p->state = RUNNING;
         c->proc = highest_p;
         swtch(&c->context, &highest_p->context);
-
-        c->proc = 0; 
+        
+        c->proc = 0;
       }
+      release(&highest_p->lock);
     }
-    release(&highest_p->lock);
   }
 }
 
@@ -691,4 +690,37 @@ procdump(void)
     printf("%d %s %s", p->pid, state, p->name);
     printf("\n");
   }
+}
+
+int
+chprty(int pid, int prty)
+{
+  struct proc *p;
+  for(p = proc; p < &proc[NPROC]; p++) {
+    if (p->pid == pid) {
+      acquire(&p->lock);
+      p->priority = prty;
+      release(&p->lock);
+      break;
+    }
+  }
+
+  return(pid);
+}
+
+int
+getprty(int pid)
+{
+  int prty = -1;
+  struct proc *p;
+  for(p = proc; p < &proc[NPROC]; p++) {
+    if (p->pid == pid) {
+      acquire(&p->lock);
+      prty = p->priority;
+      release(&p->lock);
+      break;
+    }
+  }
+
+  return(prty);
 }

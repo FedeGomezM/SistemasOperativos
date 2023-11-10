@@ -28,6 +28,29 @@ sys_fork(void)
 }
 
 uint64
+sys_chprty(void)
+{
+  int pid_ent;
+  int prty_ent;
+  argint(0, &pid_ent);
+  argint(1, &prty_ent);
+  if (pid_ent < 0) return -1;
+  if (prty_ent < 0) return -1;
+
+  return chprty(pid_ent, prty_ent);
+}
+
+uint64
+sys_getprty(void)
+{
+  int pid_ent;
+  argint(0, &pid_ent);
+  if (pid_ent < 0) return -1;
+
+  return getprty(pid_ent);
+}
+
+uint64
 sys_wait(void)
 {
   uint64 p;

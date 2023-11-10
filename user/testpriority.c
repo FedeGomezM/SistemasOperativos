@@ -4,26 +4,51 @@
 
 int main() {
   int priority = 0;
+  int x, z;
 
-  for (int i = 0; i < 5; i++) {
-    int pid = fork(priority);
-    if (pid < 0) {
-      printf(1, "Fork failed!\n");
-    } else if (pid == 0) {
-      // Proceso hijo
-      for (int j = 1; j <= 60; j++) {
-        printf("PID %d: %d seg\n", getpid(), j);
-        sleep(1000);
-      }
-      exit();
+  int pid1 = fork();
+  priority += 1;
+  if (pid1 < 0) {
+    printf("Fork failed!\n");
+  }
+  int pid2 = fork();
+  int pid2_2 = chprty(pid2, priority);
+  if (pid2 < 0) {
+    printf("Fork failed!\n");
+  } else if (pid2_2 < 0) {
+    printf("Priority Chande Failed!\n");
+  }
+  priority += 1;
+  int pid3 = fork();
+  int pid3_2 = chprty(pid3, priority);
+  if (pid3 < 0) {
+    printf("Fork failed!\n");
+  } else if (pid3_2 < 0) {
+    printf("Priority Chande Failed!\n");
+  }
+  priority += 1;
+  int pid4 = fork();
+  int pid4_2 = chprty(pid4, priority);
+  if (pid4 < 0) {
+    printf("Fork failed!\n");
+  } else if (pid4_2 < 0) {
+    printf("Priority Chande Failed!\n");
+  }
+  priority += 1;
+  int pid5 = fork();
+  int pid5_2 = chprty(pid5, priority);
+  if (pid5 < 0) {
+    printf("Fork failed!\n");
+  } else if (pid5_2 < 0) {
+    printf("Priority Chande Failed!\n");
+  }
+  
+  for (int j = 1; j <= 60; j++) {
+    printf("PID %d - PRTY %d: %d seg\n", getpid(), getprty(getpid()), j);
+    for(z = 0; z < 400000000; z+=1){
+      x = x + 3.14*89.64;
     }
-    priority += 1;
   }
 
-  // Esperar a que todos los hijos terminen
-  for (int i = 0; i < 5; i++) {
-    wait();
-  }
-
-  exit();
+  return 0;
 }
