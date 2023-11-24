@@ -437,3 +437,65 @@ copyinstr(pagetable_t pagetable, char *dst, uint64 srcva, uint64 max)
     return -1;
   }
 }
+
+uint64
+mprotect(void) {
+  //void *addr;
+  //int len;
+
+  //argptr(0, (void*)&addr, sizeof(void*));
+  //argint(1, &len);
+
+  //if (addr < 0 || len < 0) {
+  //    return -1;  // Error en la obtención de argumentos
+  //}
+
+  // Calcula el número de páginas a proteger
+  //int npages = PGROUNDUP(len) / PGSIZE;
+
+  // Obtiene la dirección de la página base
+  //void *base = (void*)PGROUNDDOWN((uint)addr);
+
+  // Verifica si las páginas son válidas
+  //if (npages <= 0 || (uint)base + npages * PGSIZE > myproc()->sz) {
+  //    return -1;  // Error: dirección no válida
+  //}
+
+  // Cambia los permisos de las páginas a solo lectura
+  //if (mappages(myproc()->pgdir, base, npages, PTE_W, 0) < 0) {
+  //    return -1;  // Error en el mapeo de páginas
+  //}
+
+  return 0;
+}
+
+uint64
+munprotect(void) {
+  //void *addr;
+  //int len;
+
+  //argptr(0, (void*)&addr, sizeof(void*));
+  //argint(1, &len);
+
+  //if (addr < 0 || len < 0) {
+  //    return -1;  // Error en la obtención de argumentos
+  //}
+
+  // Calcula el número de páginas a desproteger
+  //int npages = PGROUNDUP(len) / PGSIZE;
+
+  // Obtiene la dirección de la página base
+  //void *base = (void*)PGROUNDDOWN((uint)addr);
+
+  // Verifica si las páginas son válidas
+  //if (npages <= 0 || (uint)base + npages * PGSIZE > myproc()->sz) {
+  //    return -1;  // Error: dirección no válida
+  //}
+
+  // Cambia los permisos de las páginas a lectura y escritura
+  //if (mappages(myproc()->pgdir, base, npages, PTE_W | PTE_U, 0) < 0) {
+  //    return -1;  // Error en el mapeo de páginas
+  //}
+
+  return 0;
+}
