@@ -528,7 +528,7 @@ sys_chmod(void)
 
   if((n = argstr(0, path, MAXPATH)) < 0)
     return -1;
-  if(pr_bit < 0)
+  if(pr_bit < 0 || pr_bit > 3)
     return -1;
   if((ip = namei(path)) == 0){
     return -1;
