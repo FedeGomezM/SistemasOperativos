@@ -268,6 +268,7 @@ create(char *path, short type, short major, short minor)
   }
 
   ilock(ip);
+  ip->protect = 3;
   ip->major = major;
   ip->minor = minor;
   ip->nlink = 1;
@@ -359,6 +360,17 @@ sys_open(void)
   f->ip = ip;
   f->readable = !(omode & O_WRONLY);
   f->writable = (omode & O_WRONLY) || (omode & O_RDWR);
+
+  if((f->readable) && (f->ip->protect == 0 || f->ip->protect == 2)){
+    iunlockput(ip);
+    end_op();
+    return -1;
+  }
+  if((f->writable) && (f->ip->protect == 0 || f->ip->protect == 1)){
+    iunlockput(ip);
+    end_op();
+    return -1;
+  }
 
   if((omode & O_TRUNC) && ip->type == T_FILE){
     itrunc(ip);
@@ -501,5 +513,30 @@ sys_pipe(void)
     fileclose(wf);
     return -1;
   }
+  return 0;
+}
+
+uint64
+sys_chmod(void)
+{
+  char path[MAXPATH];
+  int pr_bit;
+  struct inode *ip;
+  int n;
+
+  argint(1, &pr_bit);
+
+  if((n = argstr(0, path, MAXPATH)) < 0)
+    return -1;
+  if(pr_bit < 0)
+    return -1;
+  if((ip = namei(path)) == 0){
+    return -1;
+  }
+  
+  ilock(ip);
+  ip->protect = pr_bit;
+  iunlockput(ip);
+    
   return 0;
 }
